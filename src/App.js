@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as firebase from "firebase";
 
 import "./App.css";
@@ -19,6 +19,25 @@ function App() {
   const [userName, setUserName] = useState("");
   const [age, setAge] = useState("");
   const [documentId, setDocumentId] = useState("");
+
+  useEffect(() => {
+    const db = firebase.firestore();
+    const unsubscribe = db
+      .collection("users")
+      .orderBy("age", "desc")
+      .onSnapshot((querySnapshot) => {
+        const _users = querySnapshot.docs.map((doc) => {
+          return {
+            userId: doc.id,
+            ...doc.data(),
+          };
+        });
+        setUsers(_users);
+      });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const handleClickFetchButton = async () => {
     const db = firebase.firestore();
