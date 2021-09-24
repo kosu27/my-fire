@@ -16,6 +16,8 @@ firebase.initializeApp(firebaseConfig);
 
 function App() {
   const [users, setUsers] = useState([]);
+  const [userName, setUserName] = useState("");
+  const [age, setAge] = useState("");
 
   const handleClickFetchButton = async () => {
     const db = firebase.firestore();
@@ -32,6 +34,37 @@ function App() {
     setUsers(_users);
   };
 
+  const handleClickAddButton = async () => {
+    if (!userName || !age) {
+      alert('"userName" or "age" が空です');
+      return;
+    }
+    const parsedAge = parseInt(age, 10);
+
+    if (isNaN(parsedAge)) {
+      alert('"number" は半角の数値で入力してください');
+      return;
+    }
+
+    const db = firebase.firestore();
+    //setでの追加方法
+
+    // await db.collection("users").doc("1").set(
+    //   {
+    //     // name: "Dummy",
+    //     age: 1,
+    //   },
+    //   { merge: true }
+    // );
+    await db.collection("users").add({
+      name: userName,
+      age: parsedAge,
+    });
+
+    setUserName("");
+    setAge("");
+  };
+
   const userListItems = users.map((user) => {
     return (
       <li key={user.userId}>
@@ -43,7 +76,28 @@ function App() {
   return (
     <div className="App">
       <h1>Hello World2</h1>
+      <div>
+        <label htmlFor="username">userName : </label>
+        <input
+          type="text"
+          id="username"
+          value={userName}
+          onChange={(e) => {
+            setUserName(e.target.value);
+          }}
+        />
+        <label htmlFor="age">age : </label>
+        <input
+          type="text"
+          id="age"
+          value={age}
+          onChange={(e) => {
+            setAge(e.target.value);
+          }}
+        />
+      </div>
       <button onClick={handleClickFetchButton}>取得</button>
+      <button onClick={handleClickAddButton}>追加</button>
       <ul>{userListItems}</ul>
     </div>
   );
