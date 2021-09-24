@@ -97,6 +97,23 @@ function App() {
     }
   };
 
+  const handleClickDeleteButton = async () => {
+    if (!documentId) {
+      alert('"documentId" をセットしてください');
+      return;
+    }
+
+    try {
+      const db = firebase.firestore();
+      await db.collection("users").doc(documentId).delete();
+      setUserName("");
+      setAge("");
+      setDocumentId("");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const userListItems = users.map((user) => {
     return (
       <li key={user.userId}>
@@ -145,6 +162,7 @@ function App() {
       <button onClick={handleClickFetchButton}>取得</button>
       <button onClick={handleClickAddButton}>追加</button>
       <button onClick={handleClickUpdateButton}>更新</button>
+      <button onClick={handleClickDeleteButton}>削除</button>
       <ul>{userListItems}</ul>
     </div>
   );
