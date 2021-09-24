@@ -18,6 +18,7 @@ function App() {
   const [users, setUsers] = useState([]);
   const [userName, setUserName] = useState("");
   const [age, setAge] = useState("");
+  const [documentId, setDocumentId] = useState("");
 
   const handleClickFetchButton = async () => {
     const db = firebase.firestore();
@@ -65,10 +66,45 @@ function App() {
     setAge("");
   };
 
+  const handleClickUpdateButton = async () => {
+    if (!documentId) {
+      alert('"documentId" をセットしてください');
+      return;
+    }
+
+    // const db = firebase.firestore();
+    // await db.collection("users").doc("5AvbTaUeQgxsEMlHsjit").update({
+    //   name: "田中",
+    //   age: 20,
+    // });
+
+    const newData = {};
+    if (userName) {
+      newData["name"] = userName;
+    }
+    if (age) {
+      newData["age"] = parseInt(age, 10);
+    }
+
+    try {
+      const db = firebase.firestore();
+      await db.collection("users").doc(documentId).update(newData);
+      setUserName("");
+      setAge("");
+      setDocumentId("");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const userListItems = users.map((user) => {
     return (
       <li key={user.userId}>
-        {user.name} : {user.age} : {user.location}
+        <ul>
+          <li>ID : {user.userId}</li>
+          <li>name : {user.name} </li>
+          <li>age : {user.age}</li>
+        </ul>
       </li>
     );
   });
@@ -95,9 +131,20 @@ function App() {
             setAge(e.target.value);
           }}
         />
+        <label htmlFor="documentId">documentId : </label>
+        <input
+          type="text"
+          id="documentId"
+          value={documentId}
+          onChange={(e) => {
+            setDocumentId(e.target.value);
+          }}
+        />
+        ;
       </div>
       <button onClick={handleClickFetchButton}>取得</button>
       <button onClick={handleClickAddButton}>追加</button>
+      <button onClick={handleClickUpdateButton}>更新</button>
       <ul>{userListItems}</ul>
     </div>
   );
